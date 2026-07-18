@@ -1,0 +1,291 @@
+{
+  "common": {
+    "loading": "جاري التحميل...",
+    "error": "حدث خطأ غير متوقع",
+    "retry": "إعادة المحاولة",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "close": "إغلاق",
+    "back": "رجوع",
+    "next": "التالي",
+    "previous": "السابق",
+    "submit": "إرسال",
+    "search": "بحث",
+    "noResults": "لا توجد نتائج",
+    "viewAll": "عرض الكل",
+    "more": "المزيد",
+    "less": "أقل",
+    "yes": "نعم",
+    "no": "لا",
+    "or": "أو",
+    "and": "و",
+    "minutes": "دقائق",
+    "hours": "ساعات",
+    "days": "أيام",
+    "months": "أشهر",
+    "years": "سنوات",
+    "ago": "منذ",
+    "updated": "محدث",
+    "published": "منشور",
+    "status": "الحالة",
+    "rating": "التقييم",
+    "duration": "المدة",
+    "language": "اللغة",
+    "subtitles": "الترجمات",
+    "audio": "الصوت"
+  },
+  "nav": {
+    "home": "الرئيسية",
+    "anime": "أنمي",
+    "movies": "أفلام",
+    "series": "مسلسلات",
+    "korean": "أنمي كوري",
+    "chinese": "أنمي صيني",
+    "news": "أخبار",
+    "schedule": "جدول البث",
+    "search": "بحث",
+    "login": "تسجيل الدخول",
+    "register": "إنشاء حساب",
+    "profile": "الملف الشخصي",
+    "settings": "الإعدادات",
+    "logout": "تسجيل الخروج",
+    "myList": "قائمتي",
+    "history": "سجل المشاهدة",
+    "favorites": "المفضلة",
+    "notifications": "الإشعارات",
+    "admin": "لوحة التحكم"
+  },
+  "home": {
+    "hero": {
+      "watchNow": "شاهد الآن",
+      "trailer": "مشاهدة العرض التشويقي",
+      "addToWatchlist": "إضافة إلى قائمتي",
+      "addToFavorites": "إضافة إلى المفضلة",
+      "moreInfo": "مزيد من المعلومات",
+      "episodes": "حلقة",
+      "season": "موسم",
+      "year": "سنة"
+    },
+    "sections": {
+      "trending": "الأكثر رواجاً",
+      "latest": "أحدث الحلقات",
+      "popular": "الأكثر شعبية",
+      "continueWatching": "متابعة المشاهدة",
+      "recommendations": "موصى به لك",
+      "upcoming": "قريباً",
+      "topRated": "الأعلى تقييماً",
+      "recentlyUpdated": "محدث مؤخراً",
+      "newReleases": "إصدارات جديدة",
+      "staffPicks": "اختيارات المحررين",
+      "classics": "الكلاسيكيات",
+      "movies": "أفلام أنمي",
+      "ova": "أوفا (OVA)",
+      "ona": "أونا (ONA)"
+    },
+    "categories": {
+      "genres": "التصنيفات",
+      "studios": "الاستوديوهات",
+      "countries": "الدول",
+      "years": "السنوات",
+      "seasons": "المواسم"
+    }
+  },
+  "videoPlayer": {
+    "play": "تشغيل",
+    "pause": "إيقاف مؤقت",
+    "mute": "كتم الصوت",
+    "unmute": "إلغاء كتم الصوت",
+    "volume": "مستوى الصوت",
+    "quality": "الجودة",
+    "auto": "تلقائي",
+    "speed": "سرعة التشغيل",
+    "normal": "عادي",
+    "fullscreen": "ملء الشاشة",
+    "exitFullscreen": "خروج من ملء الشاشة",
+    "pip": "صورة داخل صورة",
+    "theaterMode": "وضع السينما",
+    "miniPlayer": "مشغل مصغر",
+    "skipIntro": "تخطي المقدمة",
+    "skipOutro": "تخطي النهاية",
+    "nextEpisode": "الحلقة التالية",
+    "prevEpisode": "الحلقة السابقة",
+    "autoPlay": "تشغيل تلقائي",
+    "autoPlayNext": "تشغيل الحلقة التالية تلقائياً",
+    "subtitles": "الترجمات",
+    "off": "إيقاف",
+    "settings": "الإعدادات",
+    "airplay": "AirPlay",
+    "chromecast": "Chromecast",
+    "keyboardShortcuts": "اختصارات لوحة المفاتيح",
+    "reportIssue": "الإبلاغ عن مشكلة",
+    "watched": "تمت المشاهدة",
+    "markAsUnwatched": "تحديد كغير مشاهد",
+    "timestamp": {
+      "copied": "تم نسخ الطابع الزمني"
+    }
+  },
+  "search": {
+    "title": "البحث",
+    "placeholder": "ابحث عن أنمي، أفلام، مسلسلات...",
+    "filters": {
+      "title": "تصفية النتائج",
+      "genre": "التصنيف",
+      "type": "النوع",
+      "status": "الحالة",
+      "year": "السنة",
+      "season": "الموسم",
+      "studio": "الاستوديو",
+      "country": "البلد",
+      "rating": "التقييم",
+      "duration": "المدة الزمنية",
+      "language": "لغة الصوت",
+      "subtitle": "لغة الترجمة",
+      "sort": "ترتيب حسب",
+      "popularity": "الشعبية",
+      "newest": "الأحدث",
+      "oldest": "الأقدم",
+      "highestRated": "الأعلى تقييماً",
+      "lowestRated": "الأقل تقييماً",
+      "aToZ": "من الألف إلى الياء",
+      "zToA": "من الياء إلى الألف"
+    },
+    "status": {
+      "ongoing": "يعرض حالياً",
+      "completed": "مكتمل",
+      "upcoming": "قادم",
+      "hiatus": "متوقف مؤقتاً",
+      "cancelled": "ملغي"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "تسجيل الدخول",
+      "subtitle": "مرحباً بعودتك! سجل دخولك للمتابعة.",
+      "email": "البريد الإلكتروني",
+      "password": "كلمة المرور",
+      "forgotPassword": "نسيت كلمة المرور؟",
+      "rememberMe": "تذكرني",
+      "submit": "دخول",
+      "noAccount": "ليس لديك حساب؟",
+      "createAccount": "إنشاء حساب جديد",
+      "oauth": {
+        "google": "المتابعة مع Google",
+        "github": "المتابعة مع GitHub",
+        "discord": "المتابعة مع Discord"
+      }
+    },
+    "register": {
+      "title": "إنشاء حساب جديد",
+      "subtitle": "انضم إلى مجتمع أنيفيرس واستمتع بأفضل تجربة مشاهدة.",
+      "username": "اسم المستخدم",
+      "email": "البريد الإلكتروني",
+      "password": "كلمة المرور",
+      "confirmPassword": "تأكيد كلمة المرور",
+      "submit": "إنشاء الحساب",
+      "hasAccount": "لديك حساب بالفعل؟",
+      "login": "سجل دخولك",
+      "terms": "بإنشاء حساب، فإنك توافق على شروط الخدمة وسياسة الخصوصية."
+    },
+    "forgotPassword": {
+      "title": "إعادة تعيين كلمة المرور",
+      "subtitle": "أدخل بريدك الإلكتروني وسنرسل لك رابطاً لإعادة التعيين.",
+      "email": "البريد الإلكتروني",
+      "submit": "إرسال الرابط",
+      "backToLogin": "العودة إلى تسجيل الدخول",
+      "success": "تم إرسال رابط إعادة التعيين إلى بريدك الإلكتروني."
+    },
+    "verifyEmail": {
+      "title": "تأكيد البريد الإلكتروني",
+      "subtitle": "لقد أرسلنا رابط تأكيد إلى بريدك الإلكتروني. يرجى التحقق من صندوق الوارد.",
+      "resend": "إعادة إرسال الرابط",
+      "success": "تم تأكيد بريدك الإلكتروني بنجاح!"
+    },
+    "errors": {
+      "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
+      "emailExists": "البريد الإلكتروني مسجل مسبقاً.",
+      "usernameExists": "اسم المستخدم مستخدم مسبقاً.",
+      "weakPassword": "كلمة المرور ضعيفة جداً.",
+      "networkError": "خطأ في الشبكة. يرجى المحاولة لاحقاً."
+    }
+  },
+  "profile": {
+    "title": "الملف الشخصي",
+    "editProfile": "تعديل الملف الشخصي",
+    "avatar": "الصورة الشخصية",
+    "changeAvatar": "تغيير الصورة",
+    "removeAvatar": "إزالة الصورة",
+    "username": "اسم المستخدم",
+    "email": "البريد الإلكتروني",
+    "bio": "نبذة عني",
+    "gender": "الجنس",
+    "male": "ذكر",
+    "female": "أنثى",
+    "other": "آخر",
+    "dateOfBirth": "تاريخ الميلاد",
+    "country": "الدولة",
+    "language": "اللغة المفضلة",
+    "theme": "المظهر",
+    "themeLight": "فاتح",
+    "themeDark": "داكن",
+    "themeAmoled": "أسود (AMOLED)",
+    "tabs": {
+      "overview": "نظرة عامة",
+      "watchlist": "قائمة المشاهدة",
+      "favorites": "المفضلة",
+      "history": "سجل المشاهدة",
+      "reviews": "المراجعات",
+      "comments": "التعليقات",
+      "settings": "الإعدادات"
+    },
+    "watchlist": {
+      "planning": "أخطط للمشاهدة",
+      "watching": "أشاهد حالياً",
+      "completed": "مكتمل",
+      "onHold": "متوقف",
+      "dropped": "متروك"
+    },
+    "settings": {
+      "account": "إعدادات الحساب",
+      "security": "الأمان والخصوصية",
+      "notifications": "إعدادات الإشعارات",
+      "playback": "إعدادات التشغيل",
+      "subscriptions": "الاشتراكات",
+      "twoFactor": "المصادقة الثنائية",
+      "changePassword": "تغيير كلمة المرور",
+      "deleteAccount": "حذف الحساب",
+      "deleteAccountWarning": "هذا الإجراء لا يمكن التراجع عنه. سيتم حذف جميع بياناتك نهائياً."
+    }
+  },
+  "footer": {
+    "about": "عن أنيفيرس",
+    "contact": "اتصل بنا",
+    "terms": "شروط الخدمة",
+    "privacy": "سياسة الخصوصية",
+    "dmca": "DMCA",
+    "faq": "الأسئلة الشائعة",
+    "blog": "المدونة",
+    "careers": "الوظائف",
+    "social": "تابعنا",
+    "copyright": "جميع الحقوق محفوظة © {year} أنيفيرس.",
+    "madeWith": "صُنع بـ ❤️ لمحبي الأنمي."
+  },
+  "errors": {
+    "404": {
+      "title": "الصفحة غير موجودة",
+      "description": "عذراً، لم نتمكن من العثور على الصفحة التي تبحث عنها.",
+      "goHome": "العودة إلى الرئيسية"
+    },
+    "500": {
+      "title": "خطأ في الخادم",
+      "description": "حدث خطأ غير متوقع في الخادم. يرجى المحاولة لاحقاً.",
+      "goHome": "العودة إلى الرئيسية"
+    },
+    "offline": {
+      "title": "أنت غير متصل بالإنترنت",
+      "description": "يرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.",
+      "retry": "إعادة المحاولة"
+    }
+  }
+}
