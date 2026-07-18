@@ -1,0 +1,56 @@
+# ==============================================================================
+# AniVerse Monorepo - pnpm Workspace Configuration
+# ==============================================================================
+# This file defines the workspaces for the monorepo.
+# It tells pnpm where to find the packages and apps.
+# ==============================================================================
+
+packages:
+  # Applications (Next.js, NestJS, etc.)
+  - "apps/*"
+  
+  # Shared packages (Database, UI, Config, Utils, etc.)
+  - "packages/*"
+  
+  # Internal tools and scripts
+  - "tools/*"
+
+# ==============================================================================
+# Catalogs (Optional but recommended for monorepos)
+# Allows defining shared dependency versions across the workspace.
+# ==============================================================================
+catalog:
+  # React Ecosystem
+  react: ^18.3.1
+  react-dom: ^18.3.1
+  "@types/react": ^18.3.3
+  "@types/react-dom": ^18.3.0
+  
+  # Next.js
+  next: ^14.2.3
+  
+  # NestJS
+  "@nestjs/common": ^10.3.8
+  "@nestjs/core": ^10.3.8
+  "@nestjs/platform-express": ^10.3.8
+  
+  # Database
+  "@prisma/client": ^5.14.0
+  prisma: ^5.14.0
+  
+  # TypeScript & Tooling
+  typescript: ^5.4.5
+  eslint: ^8.57.0
+  prettier: ^3.2.5
+  
+  # Tailwind CSS
+  tailwindcss: ^3.4.3
+  postcss: ^8.4.38
+  autoprefixer: ^10.4.19
+
+# ==============================================================================
+# Peer Dependency Rules
+# ==============================================================================
+onlyBuiltDependencies:
+  - "@prisma/client"
+  - "prisma"
