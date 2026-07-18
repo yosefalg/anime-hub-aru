@@ -1,0 +1,291 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "An unexpected error occurred",
+    "retry": "Retry",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "search": "Search",
+    "noResults": "No results found",
+    "viewAll": "View All",
+    "more": "More",
+    "less": "Less",
+    "yes": "Yes",
+    "no": "No",
+    "or": "or",
+    "and": "and",
+    "minutes": "minutes",
+    "hours": "hours",
+    "days": "days",
+    "months": "months",
+    "years": "years",
+    "ago": "ago",
+    "updated": "Updated",
+    "published": "Published",
+    "status": "Status",
+    "rating": "Rating",
+    "duration": "Duration",
+    "language": "Language",
+    "subtitles": "Subtitles",
+    "audio": "Audio"
+  },
+  "nav": {
+    "home": "Home",
+    "anime": "Anime",
+    "movies": "Movies",
+    "series": "TV Series",
+    "korean": "Korean Animation",
+    "chinese": "Chinese Animation",
+    "news": "News",
+    "schedule": "Broadcast Schedule",
+    "search": "Search",
+    "login": "Log In",
+    "register": "Sign Up",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Log Out",
+    "myList": "My List",
+    "history": "Watch History",
+    "favorites": "Favorites",
+    "notifications": "Notifications",
+    "admin": "Admin Panel"
+  },
+  "home": {
+    "hero": {
+      "watchNow": "Watch Now",
+      "trailer": "Watch Trailer",
+      "addToWatchlist": "Add to My List",
+      "addToFavorites": "Add to Favorites",
+      "moreInfo": "More Info",
+      "episodes": "Episodes",
+      "season": "Season",
+      "year": "Year"
+    },
+    "sections": {
+      "trending": "Trending Now",
+      "latest": "Latest Episodes",
+      "popular": "Most Popular",
+      "continueWatching": "Continue Watching",
+      "recommendations": "Recommended for You",
+      "upcoming": "Upcoming",
+      "topRated": "Top Rated",
+      "recentlyUpdated": "Recently Updated",
+      "newReleases": "New Releases",
+      "staffPicks": "Staff Picks",
+      "classics": "Classics",
+      "movies": "Anime Movies",
+      "ova": "OVA",
+      "ona": "ONA"
+    },
+    "categories": {
+      "genres": "Genres",
+      "studios": "Studios",
+      "countries": "Countries",
+      "years": "Years",
+      "seasons": "Seasons"
+    }
+  },
+  "videoPlayer": {
+    "play": "Play",
+    "pause": "Pause",
+    "mute": "Mute",
+    "unmute": "Unmute",
+    "volume": "Volume",
+    "quality": "Quality",
+    "auto": "Auto",
+    "speed": "Playback Speed",
+    "normal": "Normal",
+    "fullscreen": "Fullscreen",
+    "exitFullscreen": "Exit Fullscreen",
+    "pip": "Picture in Picture",
+    "theaterMode": "Theater Mode",
+    "miniPlayer": "Mini Player",
+    "skipIntro": "Skip Intro",
+    "skipOutro": "Skip Outro",
+    "nextEpisode": "Next Episode",
+    "prevEpisode": "Previous Episode",
+    "autoPlay": "Auto Play",
+    "autoPlayNext": "Auto-play Next Episode",
+    "subtitles": "Subtitles",
+    "off": "Off",
+    "settings": "Settings",
+    "airplay": "AirPlay",
+    "chromecast": "Chromecast",
+    "keyboardShortcuts": "Keyboard Shortcuts",
+    "reportIssue": "Report Issue",
+    "watched": "Watched",
+    "markAsUnwatched": "Mark as Unwatched",
+    "timestamp": {
+      "copied": "Timestamp copied"
+    }
+  },
+  "search": {
+    "title": "Search",
+    "placeholder": "Search for anime, movies, series...",
+    "filters": {
+      "title": "Filter Results",
+      "genre": "Genre",
+      "type": "Type",
+      "status": "Status",
+      "year": "Year",
+      "season": "Season",
+      "studio": "Studio",
+      "country": "Country",
+      "rating": "Rating",
+      "duration": "Duration",
+      "language": "Audio Language",
+      "subtitle": "Subtitle Language",
+      "sort": "Sort By",
+      "popularity": "Popularity",
+      "newest": "Newest",
+      "oldest": "Oldest",
+      "highestRated": "Highest Rated",
+      "lowestRated": "Lowest Rated",
+      "aToZ": "A to Z",
+      "zToA": "Z to A"
+    },
+    "status": {
+      "ongoing": "Currently Airing",
+      "completed": "Completed",
+      "upcoming": "Upcoming",
+      "hiatus": "On Hiatus",
+      "cancelled": "Cancelled"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Log In",
+      "subtitle": "Welcome back! Please log in to continue.",
+      "email": "Email Address",
+      "password": "Password",
+      "forgotPassword": "Forgot password?",
+      "rememberMe": "Remember me",
+      "submit": "Log In",
+      "noAccount": "Don't have an account?",
+      "createAccount": "Create a new account",
+      "oauth": {
+        "google": "Continue with Google",
+        "github": "Continue with GitHub",
+        "discord": "Continue with Discord"
+      }
+    },
+    "register": {
+      "title": "Create Account",
+      "subtitle": "Join the AniVerse community and enjoy the ultimate streaming experience.",
+      "username": "Username",
+      "email": "Email Address",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "submit": "Create Account",
+      "hasAccount": "Already have an account?",
+      "login": "Log in",
+      "terms": "By creating an account, you agree to our Terms of Service and Privacy Policy."
+    },
+    "forgotPassword": {
+      "title": "Reset Password",
+      "subtitle": "Enter your email address and we'll send you a link to reset your password.",
+      "email": "Email Address",
+      "submit": "Send Reset Link",
+      "backToLogin": "Back to Log In",
+      "success": "A password reset link has been sent to your email."
+    },
+    "verifyEmail": {
+      "title": "Verify Email",
+      "subtitle": "We've sent a verification link to your email. Please check your inbox.",
+      "resend": "Resend Link",
+      "success": "Your email has been successfully verified!"
+    },
+    "errors": {
+      "invalidCredentials": "Invalid email or password.",
+      "emailExists": "This email is already registered.",
+      "usernameExists": "This username is already taken.",
+      "weakPassword": "Password is too weak.",
+      "networkError": "Network error. Please try again later."
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "editProfile": "Edit Profile",
+    "avatar": "Profile Picture",
+    "changeAvatar": "Change Picture",
+    "removeAvatar": "Remove Picture",
+    "username": "Username",
+    "email": "Email Address",
+    "bio": "About Me",
+    "gender": "Gender",
+    "male": "Male",
+    "female": "Female",
+    "other": "Other",
+    "dateOfBirth": "Date of Birth",
+    "country": "Country",
+    "language": "Preferred Language",
+    "theme": "Theme",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeAmoled": "AMOLED Black",
+    "tabs": {
+      "overview": "Overview",
+      "watchlist": "Watchlist",
+      "favorites": "Favorites",
+      "history": "Watch History",
+      "reviews": "Reviews",
+      "comments": "Comments",
+      "settings": "Settings"
+    },
+    "watchlist": {
+      "planning": "Plan to Watch",
+      "watching": "Currently Watching",
+      "completed": "Completed",
+      "onHold": "On Hold",
+      "dropped": "Dropped"
+    },
+    "settings": {
+      "account": "Account Settings",
+      "security": "Security & Privacy",
+      "notifications": "Notification Settings",
+      "playback": "Playback Settings",
+      "subscriptions": "Subscriptions",
+      "twoFactor": "Two-Factor Authentication",
+      "changePassword": "Change Password",
+      "deleteAccount": "Delete Account",
+      "deleteAccountWarning": "This action cannot be undone. All your data will be permanently deleted."
+    }
+  },
+  "footer": {
+    "about": "About AniVerse",
+    "contact": "Contact Us",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "dmca": "DMCA",
+    "faq": "FAQ",
+    "blog": "Blog",
+    "careers": "Careers",
+    "social": "Follow Us",
+    "copyright": "All rights reserved © {year} AniVerse.",
+    "madeWith": "Made with ❤️ for anime fans."
+  },
+  "errors": {
+    "404": {
+      "title": "Page Not Found",
+      "description": "Sorry, we couldn't find the page you're looking for.",
+      "goHome": "Go to Homepage"
+    },
+    "500": {
+      "title": "Server Error",
+      "description": "An unexpected error occurred on the server. Please try again later.",
+      "goHome": "Go to Homepage"
+    },
+    "offline": {
+      "title": "You are offline",
+      "description": "Please check your internet connection and try again.",
+      "retry": "Retry"
+    }
+  }
+}
