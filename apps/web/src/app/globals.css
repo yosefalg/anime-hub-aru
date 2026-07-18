@@ -1,0 +1,211 @@
+/* ==============================================================================
+ * AniVerse Web - Global Styles & Design System
+ * ==============================================================================
+ * This file defines the core design tokens, typography, and base styles.
+ * It supports Light, Dark, and AMOLED themes, along with Glassmorphism.
+ * ============================================================================== */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==============================================================================
+ * CSS Variables (Design Tokens)
+ * ============================================================================== */
+
+:root {
+  /* Light Mode Colors */
+  --background: 0 0% 100%;
+  --foreground: 240 10% 3.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 240 10% 3.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 10% 3.9%;
+  --primary: 262 83% 58%; /* Violet */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 240 4.8% 95.9%;
+  --secondary-foreground: 240 5.9% 10%;
+  --muted: 240 4.8% 95.9%;
+  --muted-foreground: 240 3.8% 46.1%;
+  --accent: 240 4.8% 95.9%;
+  --accent-foreground: 240 5.9% 10%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 5.9% 90%;
+  --input: 240 5.9% 90%;
+  --ring: 262 83% 58%;
+  --radius: 0.75rem;
+
+  /* Typography */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-arabic: 'Cairo', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+/* ==============================================================================
+ * Dark Mode
+ * ============================================================================== */
+
+.dark {
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+  --card: 240 10% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --popover: 240 10% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 262 83% 58%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 240 3.7% 15.9%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 240 3.7% 15.9%;
+  --muted-foreground: 240 5% 64.9%;
+  --accent: 240 3.7% 15.9%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 3.7% 15.9%;
+  --input: 240 3.7% 15.9%;
+  --ring: 262 83% 58%;
+}
+
+/* ==============================================================================
+ * AMOLED Mode (Pure Black)
+ * ============================================================================== */
+
+.amoled {
+  --background: 0 0% 0%;
+  --foreground: 0 0% 98%;
+  --card: 0 0% 4%;
+  --card-foreground: 0 0% 98%;
+  --popover: 0 0% 4%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 262 83% 58%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 9%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 0 0% 9%;
+  --muted-foreground: 240 5% 64.9%;
+  --accent: 0 0% 9%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 0 0% 14%;
+  --input: 0 0% 14%;
+  --ring: 262 83% 58%;
+}
+
+/* ==============================================================================
+ * Base Styles
+ * ============================================================================== */
+
+@layer base {
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans transition-colors duration-300;
+  }
+
+  /* Arabic Font Override */
+  html[lang="ar"] body,
+  html[dir="rtl"] body {
+    @apply font-arabic;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted rounded-full hover:bg-muted-foreground/50 transition-colors;
+  }
+
+  /* Hide scrollbar for horizontal sliders but keep functionality */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* ==============================================================================
+ * Component Styles (Glassmorphism & Utilities)
+ * ============================================================================== */
+
+@layer components {
+  /* Glassmorphism Effect */
+  .glass {
+    @apply bg-white/10 backdrop-blur-md border border-white/20 shadow-glass;
+  }
+
+  .glass-dark {
+    @apply bg-black/20 backdrop-blur-md border border-white/10 shadow-glass-dark;
+  }
+
+  .glass-card {
+    @apply bg-card/80 backdrop-blur-xl border border-border shadow-glass;
+  }
+
+  /* Premium Button Styles */
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 
+           shadow-glow transition-all duration-300 hover:shadow-glow-lg 
+           active:scale-95 rounded-lg font-medium;
+  }
+
+  .btn-glass {
+    @apply glass hover:bg-white/20 active:scale-95 rounded-lg font-medium transition-all;
+  }
+
+  /* Text Gradients */
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-400;
+  }
+
+  /* Shimmer Loading Effect */
+  .shimmer {
+    @apply bg-gradient-to-r from-transparent via-white/10 to-transparent bg-[length:1000px_100%] animate-shimmer;
+  }
+}
+
+/* ==============================================================================
+ * Video Player Specific Styles
+ * ============================================================================== */
+
+@layer utilities {
+  .video-js {
+    @apply w-full h-full rounded-xl overflow-hidden bg-black;
+  }
+
+  .video-js .vjs-control-bar {
+    @apply bg-gradient-to-t from-black/90 to-transparent h-16;
+  }
+
+  .video-js .vjs-slider {
+    @apply bg-white/20 rounded-full;
+  }
+
+  .video-js .vjs-play-progress {
+    @apply bg-primary;
+  }
+
+  .video-js .vjs-load-progress div {
+    @apply bg-white/30;
+  }
+}
