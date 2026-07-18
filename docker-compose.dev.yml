@@ -1,0 +1,188 @@
+# ==============================================================================
+# AniVerse Development Environment - Docker Compose
+# ==============================================================================
+# This file sets up the local development infrastructure including:
+# - PostgreSQL (Primary Database)
+# - Redis (Caching & Job Queues)
+# - MinIO (Local S3-compatible Storage for Videos/Images)
+# - Meilisearch (Instant Search Engine)
+# - Mailpit (Local Email Testing)
+# ==============================================================================
+
+version: "3.9"
+
+services:
+  # ----------------------------------------------------------------------------
+  # PostgreSQL Database
+  # ----------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: aniverse-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-aniverse_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-aniverse_secret_pass}
+      POSTGRES_DB: ${POSTGRES_DB:-aniverse_dev}
+      PGDATA: /data/postgres
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/data/postgres
+    networks:
+      - aniverse-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-aniverse_admin} -d ${POSTGRES_DB:-aniverse_dev}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ----------------------------------------------------------------------------
+  # Redis (Cache & BullMQ Jobs)
+  # ----------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: aniverse-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - aniverse-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ----------------------------------------------------------------------------
+  # Redis Commander (GUI for Redis - Dev Only)
+  # ----------------------------------------------------------------------------
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: aniverse-redis-gui
+    restart: unless-stopped
+    environment:
+      REDIS_HOSTS: local:redis:6379
+      HTTP_USER: ${REDIS_GUI_USER:-admin}
+      HTTP_PASSWORD: ${REDIS_GUI_PASS:-admin}
+    ports:
+      - "${REDIS_GUI_PORT:-8081}:8081"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - aniverse-network
+
+  # ----------------------------------------------------------------------------
+  # MinIO (S3-Compatible Local Storage)
+  # ----------------------------------------------------------------------------
+  minio:
+    image: minio/minio:latest
+    container_name: aniverse-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-aniverse_minio}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-aniverse_minio_pass}
+    ports:
+      - "${MINIO_API_PORT:-9000}:9000"
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - aniverse-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  # ----------------------------------------------------------------------------
+  # MinIO Client (Auto-create buckets on startup)
+  # ----------------------------------------------------------------------------
+  minio-init:
+    image: minio/mc:latest
+    container_name: aniverse-minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      sleep 5;
+      /usr/bin/mc alias set myminio http://minio:9000 ${MINIO_ROOT_USER:-aniverse_minio} ${MINIO_ROOT_PASSWORD:-aniverse_minio_pass};
+      /usr/bin/mc mb myminio/aniverse-videos --ignore-existing;
+      /usr/bin/mc mb myminio/aniverse-images --ignore-existing;
+      /usr/bin/mc mb myminio/aniverse-subtitles --ignore-existing;
+      /usr/bin/mc mb myminio/aniverse-avatars --ignore-existing;
+      /usr/bin/mc anonymous set download myminio/aniverse-images;
+      /usr/bin/mc anonymous set download myminio/aniverse-avatars;
+      exit 0;
+      "
+    networks:
+      - aniverse-network
+
+  # ----------------------------------------------------------------------------
+  # Meilisearch (Instant Search Engine)
+  # ----------------------------------------------------------------------------
+  meilisearch:
+    image: getmeili/meilisearch:v1.7
+    container_name: aniverse-meilisearch
+    restart: unless-stopped
+    environment:
+      MEILI_ENV: development
+      MEILI_MASTER_KEY: ${MEILI_MASTER_KEY:-aniverse_meili_master_key}
+      MEILI_NO_ANALYTICS: "true"
+      MEILI_MAX_INDEXING_MEMORY: 512M
+      MEILI_MAX_INDEXING_THREADS: 2
+    ports:
+      - "${MEILI_PORT:-7700}:7700"
+    volumes:
+      - meili_data:/meili_data
+    networks:
+      - aniverse-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7700/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  # ----------------------------------------------------------------------------
+  # Mailpit (Local Email Testing)
+  # ----------------------------------------------------------------------------
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: aniverse-mailpit
+    restart: unless-stopped
+    ports:
+      - "${MAIL_SMTP_PORT:-1025}:1025"
+      - "${MAIL_UI_PORT:-8025}:8025"
+    volumes:
+      - mailpit_data:/data
+    networks:
+      - aniverse-network
+
+# ==============================================================================
+# Volumes
+# ==============================================================================
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  minio_data:
+    driver: local
+  meili_data:
+    driver: local
+  mailpit_data:
+    driver: local
+
+# ==============================================================================
+# Networks
+# ==============================================================================
+networks:
+  aniverse-network:
+    driver: bridge
+    name: aniverse-network
