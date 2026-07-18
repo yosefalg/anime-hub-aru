@@ -1,0 +1,1212 @@
+// ==============================================================================
+// AniVerse Database Schema - Production Ready
+// ==============================================================================
+// A comprehensive schema supporting:
+// - Multi-language content (Anime, Movies, TV Series, etc.)
+// - Advanced user features (Watch history, favorites, playlists)
+// - Complete subtitle system with multiple tracks
+// - AI-powered metadata and recommendations
+// - Full audit logging and soft deletes
+// ==============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["multiSchema", "fullTextSearch", "postgresqlExtensions"]
+  output          = "../src/generated/client"
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  directUrl  = env("DATABASE_DIRECT_URL")
+  extensions = ["pg_trgm", "uuid_ossp"]
+  schemas    = ["public", "analytics"]
+}
+
+// ==============================================================================
+// ENUMS
+// ==============================================================================
+
+enum ContentType {
+  ANIME
+  ANIMATION
+  KOREAN_ANIMATION
+  CHINESE_ANIMATION
+  MOVIE
+  TV_SERIES
+  OVA
+  ONA
+  SPECIAL
+}
+
+enum MediaStatus {
+  ONGOING
+  COMPLETED
+  HIATUS
+  CANCELLED
+  UPCOMING
+  IN_PRODUCTION
+}
+
+enum UserRole {
+  USER
+  PREMIUM
+  MODERATOR
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  BANNED
+  PENDING_VERIFICATION
+}
+
+enum SubscriptionTier {
+  FREE
+  PREMIUM_MONTHLY
+  PREMIUM_YEARLY
+  PREMIUM_LIFETIME
+}
+
+enum VideoQuality {
+  _360P
+  _480P
+  _720P
+  _1080P
+  _1440P
+  _4K
+}
+
+enum StreamingProtocol {
+  HLS
+  DASH
+  PROGRESSIVE
+}
+
+enum SubtitleFormat {
+  SRT
+  VTT
+  ASS
+  SSA
+  JSON
+}
+
+enum NotificationType {
+  NEW_EPISODE
+  NEW_CONTENT
+  COMMENT_REPLY
+  MENTION
+  SYSTEM
+  PROMOTION
+  WATCHLIST_UPDATE
+}
+
+enum CommentType {
+  GENERAL
+  REVIEW
+  EPISODE
+  TIMESTAMP
+}
+
+enum ReportStatus {
+  PENDING
+  UNDER_REVIEW
+  RESOLVED
+  DISMISSED
+  ACTION_TAKEN
+}
+
+enum ReportType {
+  INAPPROPRIATE_CONTENT
+  COPYRIGHT_INFRINGEMENT
+  SPAM
+  HARASSMENT
+  INCORRECT_METADATA
+  BROKEN_VIDEO
+  INCORRECT_SUBTITLE
+  OTHER
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  RESTORE
+  APPROVE
+  REJECT
+  PUBLISH
+  UNPUBLISH
+  LOGIN
+  LOGOUT
+  PASSWORD_CHANGE
+  ROLE_CHANGE
+}
+
+enum Language {
+  ARABIC
+  ENGLISH
+  JAPANESE
+  CHINESE
+  KOREAN
+  FRENCH
+  GERMAN
+  SPANISH
+  ITALIAN
+  PORTUGUESE
+  TURKISH
+  RUSSIAN
+  HINDI
+  INDONESIAN
+  MALAY
+  THAI
+  VIETNAMESE
+}
+
+enum ReleaseType {
+  TV
+  MOVIE
+  OVA
+  ONA
+  SPECIAL
+  MUSIC
+}
+
+enum AgeRating {
+  G
+  PG
+  PG13
+  R17
+  R18
+  RX
+}
+
+// ==============================================================================
+// MODELS
+// ==============================================================================
+
+// ------------------------------------------------------------------------------
+// User & Authentication
+// ------------------------------------------------------------------------------
+
+model User {
+  id                String              @id @default(uuid())
+  email             String              @unique
+  username          String              @unique
+  password          String
+  firstName         String?
+  lastName          String?
+  displayName       String?
+  avatarUrl         String?
+  bio               String?             @db.Text
+  dateOfBirth       DateTime?
+  gender            String?
+  country           String?
+  language          Language            @default(ARABIC)
+  role              UserRole            @default(USER)
+  status            UserStatus          @default(ACTIVE)
+  subscriptionTier  SubscriptionTier    @default(FREE)
+  subscriptionEnds  DateTime?
+  emailVerified     Boolean             @default(false)
+  emailVerifiedAt   DateTime?
+  twoFactorEnabled  Boolean             @default(false)
+  twoFactorSecret   String?
+  lastLoginAt       DateTime?
+  lastLoginIp       String?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  deletedAt         DateTime?
+
+  // Relations
+  accounts          UserAccount[]
+  sessions          UserSession[]
+  watchHistory      WatchHistory[]
+  watchlist         Watchlist[]
+  favorites         Favorite[]
+  notifications     Notification[]
+  comments          Comment[]
+  reviews           Review[]
+  ratings           Rating[]
+  subtitles         Subtitle[]
+  uploads           MediaUpload[]
+  reports           Report[]
+  auditLogs         AuditLog[]
+  following         UserFollow[]        @relation("UserFollowing")
+  followers         UserFollow[]        @relation("UserFollowers")
+  playlists         Playlist[]
+  achievements      UserAchievement[]
+
+  @@index([email])
+  @@index([username])
+  @@index([status])
+  @@index([createdAt])
+  @@index([role, status])
+  @@map("users")
+}
+
+model UserAccount {
+  id                String    @id @default(uuid())
+  userId            String
+  provider          String    // google, github, discord, etc.
+  providerAccountId String
+  type              String
+  accessToken       String?   @db.Text
+  refreshToken      String?   @db.Text
+  expiresAt         DateTime?
+  scope             String?
+  idToken           String?   @db.Text
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, provider, providerAccountId])
+  @@index([provider])
+  @@map("user_accounts")
+}
+
+model UserSession {
+  id           String   @id @default(uuid())
+  userId       String
+  token        String   @unique @db.Text
+  refreshToken String?  @unique @db.Text
+  userAgent    String?
+  ipAddress    String?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+  revokedAt    DateTime?
+  revokedReason String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+  @@map("user_sessions")
+}
+
+// ------------------------------------------------------------------------------
+// Social & Following
+// ------------------------------------------------------------------------------
+
+model UserFollow {
+  id           String   @id @default(uuid())
+  followerId   String
+  followingId  String
+  createdAt    DateTime @default(now())
+
+  follower User @relation("UserFollowing", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("UserFollowers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+  @@map("user_follows")
+}
+
+// ------------------------------------------------------------------------------
+// Media Content (Anime, Movies, TV Series, etc.)
+// ------------------------------------------------------------------------------
+
+model Media {
+  id                String          @id @default(uuid())
+  title             String
+  titleNative       String?
+  titleEnglish      String?
+  titleArabic       String?
+  slug              String          @unique
+  description       String?         @db.Text
+  descriptionArabic String?         @db.Text
+  type              ContentType
+  status            MediaStatus     @default(ONGOING)
+  releaseType       ReleaseType?
+  releaseDate       DateTime?
+  endDate           DateTime?
+  season            Int?
+  seasonYear        Int?
+  episodes          Int             @default(0)
+  duration          Int?            // in minutes
+  country           String?
+  studios           Studio[]
+  genres            Genre[]
+  tags              Tag[]
+  ageRating         AgeRating?
+  ageRatingGuide    String?
+  coverImage        String?
+  bannerImage       String?
+  trailerUrl        String?
+  trailerId         String?
+  homepageUrl       String?
+  color             String?         // dominant color
+  averageScore      Float           @default(0)
+  meanScore         Float           @default(0)
+  popularity        Int             @default(0)
+  trending          Int             @default(0)
+  favorites         Int             @default(0)
+  totalRatings      Int             @default(0)
+  totalReviews      Int             @default(0)
+  totalComments     Int             @default(0)
+  totalViews        BigInt          @default(0)
+  isLicensed        Boolean         @default(false)
+  isAdult           Boolean         @default(false)
+  isFeatured        Boolean         @default(false)
+  isTrending        Boolean         @default(false)
+  published         Boolean         @default(false)
+  publishedAt       DateTime?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  deletedAt         DateTime?
+
+  // Relations
+  episodes          Episode[]
+  videos            Video[]
+  subtitles         Subtitle[]
+  characters        MediaCharacter[]
+  staff             MediaStaff[]
+  relations         MediaRelation[] @relation("MediaRelations")
+  relatedMedia      MediaRelation[] @relation("RelatedMedia")
+  recommendations   Recommendation[] @relation("Recommendations")
+  recommendedMedia  Recommendation[] @relation("RecommendedMedia")
+  news              NewsArticle[]
+  externalIds       ExternalId[]
+  ratings           Rating[]
+  reviews           Review[]
+  comments          Comment[]
+  watchlist         Watchlist[]
+  favorites         Favorite[]
+  watchHistory      WatchHistory[]
+  playlists         PlaylistMedia[]
+  auditLogs         AuditLog[]
+
+  @@fulltext([title, titleNative, titleEnglish, titleArabic, description, descriptionArabic])
+  @@index([slug])
+  @@index([type])
+  @@index([status])
+  @@index([releaseDate])
+  @@index([popularity])
+  @@index([trending])
+  @@index([averageScore])
+  @@index([published])
+  @@index([createdAt])
+  @@index([type, status, published])
+  @@index([country])
+  @@map("media")
+}
+
+model Episode {
+  id            String        @id @default(uuid())
+  mediaId       String
+  episodeNumber Float
+  title         String?
+  titleNative   String?
+  titleArabic   String?
+  description   String?       @db.Text
+  descriptionArabic String?    @db.Text
+  aired         DateTime?
+  duration      Int?          // in minutes
+  thumbnail     String?
+  coverImage    String?
+  rating        Float         @default(0)
+  totalRatings  Int           @default(0)
+  totalViews    BigInt        @default(0)
+  published     Boolean       @default(false)
+  publishedAt   DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  deletedAt     DateTime?
+
+  // Relations
+  media         Media         @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  videos        Video[]
+  subtitles     Subtitle[]
+  watchHistory  WatchHistory[]
+  comments      Comment[]
+  externalIds   ExternalId[]
+
+  @@unique([mediaId, episodeNumber])
+  @@index([mediaId])
+  @@index([episodeNumber])
+  @@index([aired])
+  @@index([published])
+  @@index([createdAt])
+  @@map("episodes")
+}
+
+model Video {
+  id              String            @id @default(uuid())
+  mediaId         String?
+  episodeId       String?
+  title           String?
+  description     String?           @db.Text
+  url             String            @db.Text
+  streamingUrl    String?           @db.Text // HLS/DASH manifest URL
+  protocol        StreamingProtocol @default(HLS)
+  quality         VideoQuality
+  format          String?           // mp4, webm, etc.
+  codec           String?           // h264, h265, av1, etc.
+  resolution      String?           // 1920x1080
+  bitrate         Int?              // in kbps
+  fileSize        BigInt?           // in bytes
+  duration        Int?              // in seconds
+  thumbnail       String?
+  previewSprite   String?           // sprite sheet for scrubbing
+  subtitles       String[]          // available subtitle languages
+  audioTracks     String[]          // available audio languages
+  isDefault       Boolean           @default(false)
+  isActive        Boolean           @default(true)
+  views           BigInt            @default(0)
+  bandwidth       Int?              // for adaptive streaming
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  // Relations
+  media           Media?            @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  episode         Episode?          @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  thumbnails      VideoThumbnail[]
+
+  @@index([mediaId])
+  @@index([episodeId])
+  @@index([quality])
+  @@index([protocol])
+  @@index([isDefault])
+  @@index([isActive])
+  @@map("videos")
+}
+
+model VideoThumbnail {
+  id        String   @id @default(uuid())
+  videoId   String
+  url       String
+  timestamp Int      // in seconds
+  width     Int?
+  height    Int?
+  createdAt DateTime @default(now())
+
+  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  @@index([videoId])
+  @@index([timestamp])
+  @@map("video_thumbnails")
+}
+
+// ------------------------------------------------------------------------------
+// Subtitles
+// ------------------------------------------------------------------------------
+
+model Subtitle {
+  id          String          @id @default(uuid())
+  mediaId     String?
+  episodeId   String?
+  language    Language
+  label       String?         // Custom label (e.g., "Arabic - Fan Sub")
+  url         String          @db.Text
+  format      SubtitleFormat  @default(SRT)
+  isDefault   Boolean         @default(false)
+  isAutoGenerated Boolean     @default(false)
+  isHearingImpaired Boolean   @default(false)
+  uploaderId  String?
+  views       BigInt          @default(0)
+  downloads   Int             @default(0)
+  rating      Float           @default(0)
+  totalRatings Int            @default(0)
+  isActive    Boolean         @default(true)
+  approved    Boolean         @default(false)
+  approvedAt  DateTime?
+  approvedBy  String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  // Relations
+  media       Media?          @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  episode     Episode?        @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  uploader    User?           @relation(fields: [uploaderId], references: [id], onDelete: SetNull)
+  ratings     SubtitleRating[]
+
+  @@index([mediaId])
+  @@index([episodeId])
+  @@index([language])
+  @@index([isDefault])
+  @@index([approved])
+  @@index([uploaderId])
+  @@map("subtitles")
+}
+
+model SubtitleRating {
+  id          String   @id @default(uuid())
+  subtitleId  String
+  userId      String
+  rating      Int      // 1-5
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  subtitle Subtitle @relation(fields: [subtitleId], references: [id], onDelete: Cascade)
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([subtitleId, userId])
+  @@index([subtitleId])
+  @@index([userId])
+  @@map("subtitle_ratings")
+}
+
+// ------------------------------------------------------------------------------
+// Genres, Tags, Studios
+// ------------------------------------------------------------------------------
+
+model Genre {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  nameArabic  String?
+  slug        String   @unique
+  description String?  @db.Text
+  coverImage  String?
+  mediaCount  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  media Media[]
+
+  @@index([slug])
+  @@map("genres")
+}
+
+model Tag {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  nameArabic  String?
+  slug        String   @unique
+  category    String?
+  mediaCount  Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  media Media[]
+
+  @@index([slug])
+  @@index([category])
+  @@map("tags")
+}
+
+model Studio {
+  id          String     @id @default(uuid())
+  name        String     @unique
+  nameArabic  String?
+  slug        String     @unique
+  description String?    @db.Text
+  website     String?
+  country     String?
+  founded     Int?
+  logo        String?
+  mediaCount  Int        @default(0)
+  isMain      Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  media Media[]
+
+  @@index([slug])
+  @@index([country])
+  @@map("studios")
+}
+
+// ------------------------------------------------------------------------------
+// Characters & Staff
+// ------------------------------------------------------------------------------
+
+model Character {
+  id            String           @id @default(uuid())
+  name          String
+  nameNative    String?
+  nameArabic    String?
+  alternativeNames String[]
+  description   String?          @db.Text
+  descriptionArabic String?       @db.Text
+  image         String?
+  gender        String?
+  dateOfBirth   DateTime?
+  age           String?
+  bloodType     String?
+  favorites     Int              @default(0)
+  role          String?          // Main, Supporting, Background
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  media         MediaCharacter[]
+  voiceActors   VoiceActor[]
+
+  @@index([name])
+  @@index([favorites])
+  @@map("characters")
+}
+
+model MediaCharacter {
+  id          String   @id @default(uuid())
+  mediaId     String
+  characterId String
+  role        String   @default("SUPPORTING") // MAIN, SUPPORTING, BACKGROUND
+  voiceActorId String?
+
+  media     Media     @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@unique([mediaId, characterId])
+  @@index([mediaId])
+  @@index([characterId])
+  @@map("media_characters")
+}
+
+model Staff {
+  id            String        @id @default(uuid())
+  name          String
+  nameNative    String?
+  nameArabic    String?
+  alternativeNames String[]
+  description   String?       @db.Text
+  descriptionArabic String?    @db.Text
+  image         String?
+  gender        String?
+  dateOfBirth   DateTime?
+  dateOfDeath   DateTime?
+  age           Int?
+  country       String?
+  language      Language?
+  yearsActive   Int[]         // [startYear, endYear]
+  homeTown      String?
+  bloodType     String?
+  primaryOccupations String[]
+  favorites     Int           @default(0)
+  website       String?
+  twitter       String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  media         MediaStaff[]
+  voiceActing   VoiceActor[]
+
+  @@index([name])
+  @@index([favorites])
+  @@map("staff")
+}
+
+model MediaStaff {
+  id        String   @id @default(uuid())
+  mediaId   String
+  staffId   String
+  role      String   // Director, Producer, Writer, etc.
+  language  String?  // For voice actors
+
+  media Media  @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  staff Staff  @relation(fields: [staffId], references: [id], onDelete: Cascade)
+
+  @@unique([mediaId, staffId, role])
+  @@index([mediaId])
+  @@index([staffId])
+  @@map("media_staff")
+}
+
+model VoiceActor {
+  id          String   @id @default(uuid())
+  characterId String
+  staffId     String
+  language    Language
+  mediaId     String?
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  staff     Staff     @relation(fields: [staffId], references: [id], onDelete: Cascade)
+
+  @@unique([characterId, staffId, language])
+  @@index([characterId])
+  @@index([staffId])
+  @@map("voice_actors")
+}
+
+// ------------------------------------------------------------------------------
+// Media Relations & Recommendations
+// ------------------------------------------------------------------------------
+
+model MediaRelation {
+  id          String   @id @default(uuid())
+  mediaId     String
+  relatedId   String
+  relationType String  // SEQUEL, PREQUEL, SIDE_STORY, ALTERNATIVE, SPIN_OFF, SUMMARY, ADAPTATION, etc.
+  createdAt   DateTime @default(now())
+
+  media       Media    @relation("MediaRelations", fields: [mediaId], references: [id], onDelete: Cascade)
+  relatedMedia Media   @relation("RelatedMedia", fields: [relatedId], references: [id], onDelete: Cascade)
+
+  @@unique([mediaId, relatedId, relationType])
+  @@index([mediaId])
+  @@index([relatedId])
+  @@index([relationType])
+  @@map("media_relations")
+}
+
+model Recommendation {
+  id            String   @id @default(uuid())
+  mediaId       String
+  recommendedId String
+  userId        String?
+  rating        Int      @default(0) // Number of users who found this helpful
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  media          Media    @relation("Recommendations", fields: [mediaId], references: [id], onDelete: Cascade)
+  recommendedMedia Media  @relation("RecommendedMedia", fields: [recommendedId], references: [id], onDelete: Cascade)
+
+  @@unique([mediaId, recommendedId])
+  @@index([mediaId])
+  @@index([recommendedId])
+  @@index([rating])
+  @@map("recommendations")
+}
+
+// ------------------------------------------------------------------------------
+// User Interactions
+// ------------------------------------------------------------------------------
+
+model WatchHistory {
+  id            String    @id @default(uuid())
+  userId        String
+  mediaId       String?
+  episodeId     String?
+  progress      Int       @default(0) // in seconds
+  duration      Int?      // total duration in seconds
+  completed     Boolean   @default(false)
+  completedAt   DateTime?
+  stoppedAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  media    Media?   @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  episode  Episode? @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, episodeId])
+  @@index([userId])
+  @@index([mediaId])
+  @@index([episodeId])
+  @@index([completed])
+  @@index([updatedAt])
+  @@map("watch_history")
+}
+
+model Watchlist {
+  id          String   @id @default(uuid())
+  userId      String
+  mediaId     String
+  status      String   @default("PLANNING") // PLANNING, WATCHING, COMPLETED, ON_HOLD, DROPPED
+  score       Int?     // 1-10
+  progress    Int      @default(0) // episodes watched
+  notes       String?  @db.Text
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  media Media @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, mediaId])
+  @@index([userId])
+  @@index([mediaId])
+  @@index([status])
+  @@index([score])
+  @@map("watchlist")
+}
+
+model Favorite {
+  id        String   @id @default(uuid())
+  userId    String
+  mediaId   String
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  media Media @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, mediaId])
+  @@index([userId])
+  @@index([mediaId])
+  @@map("favorites")
+}
+
+model Rating {
+  id        String   @id @default(uuid())
+  userId    String
+  mediaId   String
+  rating    Int      // 1-10
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  media Media @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, mediaId])
+  @@index([userId])
+  @@index([mediaId])
+  @@index([rating])
+  @@map("ratings")
+}
+
+model Review {
+  id            String      @id @default(uuid())
+  userId        String
+  mediaId       String
+  rating        Int         // 1-10
+  title         String
+  content       String      @db.Text
+  contentArabic String?     @db.Text
+  summary       String?     @db.Text
+  score         Int         @default(0) // helpful votes
+  totalVotes    Int         @default(0)
+  isSpoiler     Boolean     @default(false)
+  isPrivate     Boolean     @default(false)
+  published     Boolean     @default(false)
+  publishedAt   DateTime?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  media Media @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([mediaId])
+  @@index([rating])
+  @@index([score])
+  @@index([published])
+  @@index([createdAt])
+  @@map("reviews")
+}
+
+model Comment {
+  id          String      @id @default(uuid())
+  userId      String
+  mediaId     String?
+  episodeId   String?
+  parentId    String?
+  content     String      @db.Text
+  contentType CommentType @default(GENERAL)
+  timestamp   Int?        // for timestamp comments (in seconds)
+  isSpoiler   Boolean     @default(false)
+  isEdited    Boolean     @default(false)
+  isPinned    Boolean     @default(false)
+  score       Int         @default(0) // upvotes - downvotes
+  totalVotes  Int         @default(0)
+  replies     Int         @default(0)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  deletedAt   DateTime?
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  media    Media?   @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  episode  Episode? @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+  parent   Comment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: SetNull)
+  replies  Comment[] @relation("CommentReplies")
+
+  @@index([userId])
+  @@index([mediaId])
+  @@index([episodeId])
+  @@index([parentId])
+  @@index([contentType])
+  @@index([score])
+  @@index([createdAt])
+  @@map("comments")
+}
+
+// ------------------------------------------------------------------------------
+// Playlists
+// ------------------------------------------------------------------------------
+
+model Playlist {
+  id          String   @id @default(uuid())
+  userId      String
+  name        String
+  description String?  @db.Text
+  coverImage  String?
+  isPublic    Boolean  @default(false)
+  isCollaborative Boolean @default(false)
+  mediaCount  Int      @default(0)
+  totalDuration Int    @default(0) // in minutes
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  media   PlaylistMedia[]
+
+  @@index([userId])
+  @@index([isPublic])
+  @@index([createdAt])
+  @@map("playlists")
+}
+
+model PlaylistMedia {
+  id         String   @id @default(uuid())
+  playlistId String
+  mediaId    String
+  episodeId  String?
+  position   Int      @default(0)
+  addedAt    DateTime @default(now())
+  addedBy    String?
+
+  playlist Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  media    Media    @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@unique([playlistId, mediaId, episodeId])
+  @@index([playlistId])
+  @@index([mediaId])
+  @@index([position])
+  @@map("playlist_media")
+}
+
+// ------------------------------------------------------------------------------
+// Notifications
+// ------------------------------------------------------------------------------
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  type      NotificationType
+  title     String
+  content   String?          @db.Text
+  data      Json?
+  isRead    Boolean          @default(false)
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([type])
+  @@index([isRead])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+// ------------------------------------------------------------------------------
+// News & Articles
+// ------------------------------------------------------------------------------
+
+model NewsArticle {
+  id            String   @id @default(uuid())
+  mediaId       String?
+  title         String
+  titleArabic   String?
+  slug          String   @unique
+  content       String   @db.Text
+  contentArabic String?  @db.Text
+  excerpt       String?
+  excerptArabic String?
+  coverImage    String?
+  authorId      String?
+  source        String?
+  sourceUrl     String?
+  published     Boolean  @default(false)
+  publishedAt   DateTime?
+  views         BigInt   @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  media Media? @relation(fields: [mediaId], references: [id], onDelete: SetNull)
+
+  @@index([slug])
+  @@index([mediaId])
+  @@index([published])
+  @@index([publishedAt])
+  @@index([createdAt])
+  @@map("news_articles")
+}
+
+// ------------------------------------------------------------------------------
+// External IDs (MAL, AniList, Kitsu, etc.)
+// ------------------------------------------------------------------------------
+
+model ExternalId {
+  id         String   @id @default(uuid())
+  mediaId    String?
+  episodeId  String?
+  provider   String   // mal, anilist, kitsu, tmdb, imdb, etc.
+  externalId String
+  url        String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  media   Media?   @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+  episode Episode? @relation(fields: [episodeId], references: [id], onDelete: Cascade)
+
+  @@unique([mediaId, episodeId, provider])
+  @@index([mediaId])
+  @@index([episodeId])
+  @@index([provider])
+  @@map("external_ids")
+}
+
+// ------------------------------------------------------------------------------
+// Reports & Moderation
+// ------------------------------------------------------------------------------
+
+model Report {
+  id          String      @id @default(uuid())
+  reporterId  String
+  reportedId  String?     // User ID or Content ID
+  reportType  ReportType
+  reason      String      @db.Text
+  details     String?     @db.Text
+  status      ReportStatus @default(PENDING)
+  reviewedBy  String?
+  reviewedAt  DateTime?
+  actionTaken String?     @db.Text
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  reporter User @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+
+  @@index([reporterId])
+  @@index([reportedId])
+  @@index([status])
+  @@index([reportType])
+  @@index([createdAt])
+  @@map("reports")
+}
+
+// ------------------------------------------------------------------------------
+// Audit Logs
+// ------------------------------------------------------------------------------
+
+model AuditLog {
+  id          String      @id @default(uuid())
+  userId      String?
+  action      AuditAction
+  entityType  String      // User, Media, Episode, etc.
+  entityId    String?
+  oldValue    Json?
+  newValue    Json?
+  metadata    Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime    @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([action])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// ------------------------------------------------------------------------------
+// Achievements & Gamification
+// ------------------------------------------------------------------------------
+
+model Achievement {
+  id          String   @id @default(uuid())
+  name        String
+  nameArabic  String?
+  description String
+  descriptionArabic String?
+  icon        String?
+  category    String?
+  points      Int      @default(0)
+  rarity      String   @default("COMMON") // COMMON, RARE, EPIC, LEGENDARY
+  requirement Json?    // JSON schema for achievement requirements
+  totalEarned Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  users UserAchievement[]
+
+  @@index([category])
+  @@index([rarity])
+  @@index([points])
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            String   @id @default(uuid())
+  userId        String
+  achievementId String
+  progress      Int      @default(0)
+  completed     Boolean  @default(false)
+  completedAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+  @@index([userId])
+  @@index([achievementId])
+  @@index([completed])
+  @@map("user_achievements")
+}
+
+// ------------------------------------------------------------------------------
+// Media Uploads (User-generated content)
+// ------------------------------------------------------------------------------
+
+model MediaUpload {
+  id          String   @id @default(uuid())
+  userId      String
+  title       String
+  description String?  @db.Text
+  type        String   // video, image, subtitle
+  status      String   @default("PENDING") // PENDING, PROCESSING, COMPLETED, FAILED, REJECTED
+  url         String?
+  thumbnail   String?
+  duration    Int?
+  fileSize    BigInt?
+  format      String?
+  metadata    Json?
+  rejectionReason String?
+  uploadedAt  DateTime @default(now())
+  processedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([type])
+  @@index([uploadedAt])
+  @@map("media_uploads")
+}
+
+// ------------------------------------------------------------------------------
+// System Configuration
+// ------------------------------------------------------------------------------
+
+model SystemConfig {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     Json
+  category  String?
+  encrypted Boolean  @default(false)
+  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now())
+
+  @@index([category])
+  @@index([key])
+  @@map("system_configs")
+}
+
+// ------------------------------------------------------------------------------
+// Analytics (Optional - for advanced tracking)
+// ------------------------------------------------------------------------------
+
+model Analytics {
+  id        String   @id @default(uuid())
+  eventType String
+  userId    String?
+  mediaId   String?
+  episodeId String?
+  metadata  Json?
+  timestamp DateTime @default(now())
+
+  @@index([eventType])
+  @@index([userId])
+  @@index([mediaId])
+  @@index([timestamp])
+  @@map("analytics")
+}
