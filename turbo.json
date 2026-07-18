@@ -1,0 +1,206 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": [
+    "**/.env.*local",
+    "**/.env",
+    "**/tsconfig.json",
+    "**/tsconfig.*.json"
+  ],
+  "globalEnv": [
+    "NODE_ENV",
+    "CI",
+    "VERCEL",
+    "VERCEL_ENV",
+    "NEXT_PUBLIC_*",
+    "DATABASE_URL",
+    "REDIS_URL",
+    "JWT_SECRET",
+    "OPENAI_API_KEY",
+    "CLOUDFLARE_*",
+    "SUPABASE_*",
+    "GOOGLE_*",
+    "GITHUB_*",
+    "DISCORD_*"
+  ],
+  "remoteCache": {
+    "enabled": true,
+    "signature": true
+  },
+  "daemon": true,
+  "ui": "stream",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build", "^db:generate"],
+      "outputs": [
+        "dist/**",
+        ".next/**",
+        "!.next/cache/**",
+        "build/**",
+        "out/**",
+        ".svelte-kit/**",
+        ".vinxi/**"
+      ],
+      "inputs": [
+        "src/**",
+        "app/**",
+        "components/**",
+        "lib/**",
+        "public/**",
+        "styles/**",
+        "tsconfig.json",
+        "next.config.*",
+        "tailwind.config.*",
+        "postcss.config.*"
+      ],
+      "env": [
+        "NEXT_PUBLIC_*",
+        "NODE_ENV"
+      ],
+      "outputLogs": "new-only"
+    },
+    "dev": {
+      "dependsOn": ["^db:generate"],
+      "cache": false,
+      "persistent": true,
+      "outputLogs": "full"
+    },
+    "start": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "persistent": true,
+      "outputLogs": "new-only"
+    },
+    "lint": {
+      "dependsOn": ["^build"],
+      "outputs": [],
+      "inputs": [
+        "src/**",
+        "app/**",
+        "components/**",
+        "lib/**",
+        ".eslintrc*",
+        "eslint.config.*"
+      ],
+      "outputLogs": "errors-only"
+    },
+    "lint:fix": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "outputs": [],
+      "outputLogs": "errors-only"
+    },
+    "format": {
+      "cache": false,
+      "outputs": [],
+      "outputLogs": "errors-only"
+    },
+    "format:check": {
+      "outputs": [],
+      "outputLogs": "errors-only"
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**", "test-results/**"],
+      "inputs": [
+        "src/**",
+        "tests/**",
+        "__tests__/**",
+        "*.test.*",
+        "*.spec.*",
+        "jest.config.*",
+        "vitest.config.*"
+      ],
+      "outputLogs": "new-only"
+    },
+    "test:watch": {
+      "cache": false,
+      "persistent": true,
+      "outputLogs": "full"
+    },
+    "test:e2e": {
+      "dependsOn": ["build"],
+      "outputs": ["playwright-report/**", "test-results/**"],
+      "inputs": [
+        "e2e/**",
+        "tests/e2e/**",
+        "playwright.config.*"
+      ],
+      "outputLogs": "new-only"
+    },
+    "test:coverage": {
+      "dependsOn": ["^build"],
+      "outputs": ["coverage/**"],
+      "inputs": [
+        "src/**",
+        "tests/**",
+        "__tests__/**"
+      ],
+      "outputLogs": "new-only"
+    },
+    "type-check": {
+      "dependsOn": ["^build"],
+      "outputs": [],
+      "inputs": [
+        "src/**",
+        "app/**",
+        "components/**",
+        "lib/**",
+        "tsconfig.json"
+      ],
+      "outputLogs": "errors-only"
+    },
+    "db:generate": {
+      "dependsOn": [],
+      "outputs": ["node_modules/.prisma/**"],
+      "inputs": [
+        "prisma/schema.prisma"
+      ],
+      "outputLogs": "new-only"
+    },
+    "db:push": {
+      "dependsOn": ["db:generate"],
+      "cache": false,
+      "outputs": [],
+      "outputLogs": "full"
+    },
+    "db:migrate:dev": {
+      "dependsOn": ["db:generate"],
+      "cache": false,
+      "outputs": ["prisma/migrations/**"],
+      "outputLogs": "full"
+    },
+    "db:migrate:deploy": {
+      "dependsOn": ["db:generate"],
+      "cache": false,
+      "outputs": [],
+      "outputLogs": "full"
+    },
+    "db:seed": {
+      "dependsOn": ["db:generate"],
+      "cache": false,
+      "outputs": [],
+      "outputLogs": "full"
+    },
+    "db:studio": {
+      "dependsOn": ["db:generate"],
+      "cache": false,
+      "persistent": true,
+      "outputLogs": "full"
+    },
+    "clean": {
+      "cache": false,
+      "outputs": []
+    },
+    "storybook": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "persistent": true,
+      "outputLogs": "full"
+    },
+    "build-storybook": {
+      "dependsOn": ["^build"],
+      "outputs": ["storybook-static/**"],
+      "outputLogs": "new-only"
+    }
+  }
+}
